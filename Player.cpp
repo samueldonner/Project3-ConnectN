@@ -2,12 +2,14 @@
 
 #include "provided.h"
 #include <string>
+#include <iostream>
 using namespace std;
 
 class HumanPlayerImpl
 {
   public:
     int chooseMove(const Scaffold& s, int N, int color);
+    virtual bool isInteractive() const{return true;}
 };
 
 class BadPlayerImpl
@@ -24,12 +26,46 @@ class SmartPlayerImpl
 
 int HumanPlayerImpl::chooseMove(const Scaffold& s, int N, int color)
 {
-    return -1;  //  This is not always correct; it's just here to compile
+    if(s.numberEmpty() == 0)
+    {
+        return -1;
+    }
+    int tempCol;
+    cout << "Move to column: ";
+    cin >> tempCol;
+    
+    for(;;) // check if the move is valid
+    {
+        while( tempCol > s.cols() || tempCol < 1) // check if column is within range
+        {
+            cout << "Choose valid column: ";
+            cin >> tempCol;
+        }
+        for( int i = s.levels()-1; i >= 0; i-- ) // check column is not full
+        {
+            if(s.checkerAt(tempCol-1,i) == VACANT) //go up from bottom to find first valid space
+            {
+                return tempCol;
+            }
+        }
+        cout << "Choose valid column: ";
+        cin >> tempCol;
+    }
+    
 }
 
 int BadPlayerImpl::chooseMove(const Scaffold& s, int N, int color)
 {
-    return -1;  //  This is not always correct; it's just here to compile
+    if(s.numberEmpty() == 0)
+    {
+        return -1;
+    }
+    for( int i = 0; i < s.cols(); i++ )
+    {
+        if(s.checkerAt(i, 0) == VACANT)
+            return i+1;
+    }
+    return -1;
 }
 
 int SmartPlayerImpl::chooseMove(const Scaffold& s, int N, int color)

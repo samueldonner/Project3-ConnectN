@@ -14,13 +14,26 @@ int main()
     s.display();
     s.makeMove(1, RED);
     s.display();
-    s.undoMove();
+    //s.undoMove();
+    //s.display();
+    //s.undoMove();
+    //s.display();
+    //s.undoMove();
+    //s.undoMove();
+    //s.display();
+    HumanPlayer sam("Sam");
+    BadPlayer robot("Robot");
+    //cout<<robot.chooseMove(s,3, BLACK);
+    s.makeMove( robot.chooseMove(s,3, BLACK), BLACK);
     s.display();
-    s.undoMove();
+    s.makeMove( robot.chooseMove(s,3, RED), RED);
     s.display();
-    s.undoMove();
-    s.undoMove();
+    s.makeMove( robot.chooseMove(s,3, BLACK), BLACK);
     s.display();
+    s.makeMove( robot.chooseMove(s,3, RED), RED);
+    s.display();
+    //cout << sam.chooseMove(s, 3, BLACK);
+    
     
 	/*
     string name;
