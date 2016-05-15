@@ -52,8 +52,9 @@ bool GameImpl::completed(int& winner) const
         }
     }
     int colorOfLastMove = checkerAt(m_lastMoveCol-1, lastMoveRow);
+    
     int checkersInARow = 0;
-    for(int i = lastMoveRow; i >= 0; i--)
+    for(int i = lastMoveRow; i >= 0; i--) // check downward
     {
         int checker = checkerAt(m_lastMoveCol-1, i);
         if(checkerAt(m_lastMoveCol-1, i) != colorOfLastMove)
@@ -62,11 +63,79 @@ bool GameImpl::completed(int& winner) const
         }
         checkersInARow++;
     }
+    
     if(checkersInARow>=m_inArow)
     {
         winner = colorOfLastMove;
         return true;
     }
+    
+    
+    checkersInARow = 0;
+    int firstColInRow = 0;
+    for(int i = m_lastMoveCol-1; i >= 0; i--) // go to first in row
+    {
+        int checker = checkerAt(i, lastMoveRow);
+        if(checkerAt(i, lastMoveRow) != colorOfLastMove)
+        {
+            firstColInRow = i+1;
+            break;
+        }
+    }
+    for(int i = firstColInRow; i < m_cols; i++) // check across
+    {
+        int checker = checkerAt(i, lastMoveRow);
+        if(checkerAt(i, lastMoveRow) != colorOfLastMove)
+        {
+            break;
+        }
+        checkersInARow++;
+    }
+    
+    if(checkersInARow>=m_inArow)
+    {
+        winner = colorOfLastMove;
+        return true;
+    }
+    
+    
+    
+    checkersInARow = 0;
+    int firstColInDiagLT = 0;
+    int firstRowInDiagLT = 0;
+    for(int i = m_lastMoveCol-1; i >= 0; i--) // go to first in row
+    {
+        int checker = checkerAt(i, lastMoveRow);
+        if(checkerAt(i, lastMoveRow) != colorOfLastMove)
+        {
+            firstColInRow = i+1;
+            break;
+        }
+    }
+    for(int i = firstColInRow; i < m_cols; i++) // check across
+    {
+        int checker = checkerAt(i, lastMoveRow);
+        if(checkerAt(i, lastMoveRow) != colorOfLastMove)
+        {
+            break;
+        }
+        checkersInARow++;
+    }
+    
+    if(checkersInARow>=m_inArow)
+    {
+        winner = colorOfLastMove;
+        return true;
+    }
+    
+    
+    if(m_s.numberEmpty()==0) // if board is full game is tied
+    {
+        winner = TIE_GAME;
+        return true;
+    }
+    
+    
     return false;
 }
 
