@@ -60,10 +60,10 @@ int BadPlayerImpl::chooseMove(const Scaffold& s, int N, int color)
     {
         return -1;
     }
-    for( int i = 0; i < s.cols(); i++ )
+    for( int i = 1; i <= s.cols(); i++ )
     {
         if(s.checkerAt(i, 0) == VACANT)
-            return i+1;
+            return i;
     }
     return -1;
 }

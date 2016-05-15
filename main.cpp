@@ -7,7 +7,13 @@ using namespace std;
 
 int main()
 {
-    Scaffold s(3, 2);
+    
+    BadPlayer bp("Homer");
+    HumanPlayer hp("Marge");
+    Game g(4, 3, 3, &bp, &hp);
+    g.play();
+    
+    /*Scaffold s(3, 2);
     s.makeMove(2, RED);
     s.display();
     s.makeMove(1, BLACK);
@@ -32,7 +38,7 @@ int main()
     s.display();
     s.makeMove( robot.chooseMove(s,3, RED), RED);
     s.display();
-    //cout << sam.chooseMove(s, 3, BLACK);
+    //cout << sam.chooseMove(s, 3, BLACK);*/
     
     
 	/*

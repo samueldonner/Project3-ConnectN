@@ -74,7 +74,6 @@ int ScaffoldImpl::numberEmpty() const
             }
         }
     }
-    
     return nEmpty;
 }
 

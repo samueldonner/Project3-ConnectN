@@ -64,8 +64,8 @@
 		FA5D8CF21CE5B57C00D5443E /* Project3 */ = {
 			isa = PBXGroup;
 			children = (
-				FA5D8CFE1CE5B5EC00D5443E /* Player.cpp */,
 				FA5D8CFD1CE5B5EC00D5443E /* Game.cpp */,
+				FA5D8CFE1CE5B5EC00D5443E /* Player.cpp */,
 				FA5D8CFC1CE5B5EC00D5443E /* Scaffold.cpp */,
 				FA5D8CFB1CE5B5EC00D5443E /* main.cpp */,
 				FA5D8CFA1CE5B5EC00D5443E /* provided.h */,
