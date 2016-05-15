@@ -33,6 +33,7 @@ int HumanPlayerImpl::chooseMove(const Scaffold& s, int N, int color)
     int tempCol;
     cout << "Move to column: ";
     cin >> tempCol;
+    cin.clear();
     
     for(;;) // check if the move is valid
     {
@@ -40,6 +41,7 @@ int HumanPlayerImpl::chooseMove(const Scaffold& s, int N, int color)
         {
             cout << "Choose valid column: ";
             cin >> tempCol;
+            cin.clear();
         }
         for( int i = s.levels()-1; i >= 0; i-- ) // check column is not full
         {
@@ -50,6 +52,7 @@ int HumanPlayerImpl::chooseMove(const Scaffold& s, int N, int color)
         }
         cout << "Choose valid column: ";
         cin >> tempCol;
+        cin.clear();
     }
     
 }

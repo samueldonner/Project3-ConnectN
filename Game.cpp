@@ -46,14 +46,14 @@ bool GameImpl::completed(int& winner) const
     for(int i = 0; i < m_levs; i++)
     {
         int checker = checkerAt(m_lastMoveCol-1, i);
-        if(checkerAt(m_lastMoveCol, i) != VACANT)
+        if(checkerAt(m_lastMoveCol-1, i) != VACANT)
         {
             lastMoveRow = i; // find the row of the last move
         }
     }
     int colorOfLastMove = checkerAt(m_lastMoveCol-1, lastMoveRow);
     int checkersInARow = 0;
-    for(int i = lastMoveRow; i < m_levs; i++)
+    for(int i = lastMoveRow; i >= 0; i--)
     {
         int checker = checkerAt(m_lastMoveCol-1, i);
         if(checkerAt(m_lastMoveCol-1, i) != colorOfLastMove)
@@ -67,8 +67,6 @@ bool GameImpl::completed(int& winner) const
         winner = colorOfLastMove;
         return true;
     }
-    
-    
     return false;
 }
 
@@ -93,7 +91,7 @@ bool GameImpl::takeTurn()
 
 void GameImpl::play()
 {
-    int winner = 0;
+    int winner = -1;
     m_s.display();
     while(!completed(winner))
     {

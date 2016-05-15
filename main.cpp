@@ -9,7 +9,7 @@ int main()
 {
     
     BadPlayer bp("Homer");
-    BadPlayer hp("Marge");
+    HumanPlayer hp("Marge");
     Game g(4, 3, 3, &bp, &hp);
     g.play();
     
