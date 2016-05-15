@@ -55,7 +55,7 @@ bool GameImpl::completed(int& winner) const
     int colorOfLastMove = checkerAt(m_lastMoveCol-1, lastMoveRow);
     
     int checkersInARow = 0;
-    for(int i = lastMoveRow; i >= 0; i--) // check downward
+    for(int i = lastMoveRow; i < m_s.levels(); i++) // check downward
     {
         int checker = checkerAt(m_lastMoveCol-1, i);
         if(checkerAt(m_lastMoveCol-1, i) != colorOfLastMove)
@@ -101,7 +101,7 @@ bool GameImpl::completed(int& winner) const
     
     
     
-    checkersInARow = 0;
+    checkersInARow = 0; // check diagonally from to left to botom right
     int firstColInDiagLT = m_lastMoveCol-1;
     int firstRowInDiagLT = lastMoveRow;
     while( firstColInDiagLT>=0 && firstRowInDiagLT>=0 && checkerAt(firstColInDiagLT, firstRowInDiagLT) == colorOfLastMove)
@@ -126,7 +126,7 @@ bool GameImpl::completed(int& winner) const
     }
     
     
-    checkersInARow = 0;
+    checkersInARow = 0; // check diagonally from bottom left to top right
     int firstColInDiagLB = m_lastMoveCol-1;
     int firstRowInDiagLB = lastMoveRow;
     int checker = checkerAt(firstColInDiagLB, firstRowInDiagLB);
@@ -178,6 +178,7 @@ bool GameImpl::takeTurn()
         m_whoseTurn = RED;
         return true;
     }
+    
     return false;
 }
 
