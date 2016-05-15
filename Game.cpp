@@ -49,6 +49,7 @@ bool GameImpl::completed(int& winner) const
         if(checkerAt(m_lastMoveCol-1, i) != VACANT)
         {
             lastMoveRow = i; // find the row of the last move
+            break;
         }
     }
     int colorOfLastMove = checkerAt(m_lastMoveCol-1, lastMoveRow);
@@ -101,24 +102,46 @@ bool GameImpl::completed(int& winner) const
     
     
     checkersInARow = 0;
-    int firstColInDiagLT = 0;
-    int firstRowInDiagLT = 0;
-    for(int i = m_lastMoveCol-1; i >= 0; i--) // go to first in row
+    int firstColInDiagLT = m_lastMoveCol-1;
+    int firstRowInDiagLT = lastMoveRow;
+    while( firstColInDiagLT>=0 && firstRowInDiagLT>=0 && checkerAt(firstColInDiagLT, firstRowInDiagLT) == colorOfLastMove)
     {
-        int checker = checkerAt(i, lastMoveRow);
-        if(checkerAt(i, lastMoveRow) != colorOfLastMove)
-        {
-            firstColInRow = i+1;
-            break;
-        }
+        firstColInDiagLT--;
+        firstRowInDiagLT--;
     }
-    for(int i = firstColInRow; i < m_cols; i++) // check across
+    firstColInDiagLT++;
+    firstRowInDiagLT++;
+    while(firstColInDiagLT<m_s.cols() && firstRowInDiagLT<m_s.levels() && checkerAt(firstColInDiagLT, firstRowInDiagLT) == colorOfLastMove
+           )
     {
-        int checker = checkerAt(i, lastMoveRow);
-        if(checkerAt(i, lastMoveRow) != colorOfLastMove)
-        {
-            break;
-        }
+        firstColInDiagLT++;
+        firstRowInDiagLT++;
+        checkersInARow++;
+    }
+    
+    if(checkersInARow>=m_inArow)
+    {
+        winner = colorOfLastMove;
+        return true;
+    }
+    
+    
+    checkersInARow = 0;
+    int firstColInDiagLB = m_lastMoveCol-1;
+    int firstRowInDiagLB = lastMoveRow;
+    int checker = checkerAt(firstColInDiagLB, firstRowInDiagLB);
+    while( firstColInDiagLB>=0 && firstRowInDiagLB<m_s.levels() && checkerAt(firstColInDiagLB, firstRowInDiagLB) == colorOfLastMove)
+    {
+        firstColInDiagLB--;
+        firstRowInDiagLB++;
+    }
+    firstColInDiagLB++;
+    firstRowInDiagLB--;
+    while(firstColInDiagLB<m_s.cols() && firstRowInDiagLB>=0 && checkerAt(firstColInDiagLB, firstRowInDiagLB) == colorOfLastMove
+          )
+    {
+        firstColInDiagLB++;
+        firstRowInDiagLB--;
         checkersInARow++;
     }
     
