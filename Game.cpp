@@ -164,6 +164,11 @@ bool GameImpl::completed(int& winner) const
 
 bool GameImpl::takeTurn()
 {
+    int winner = -2;
+    if(completed(winner))
+    {
+        return false;
+    }
     if(m_whoseTurn == RED)
     {
         m_lastMoveCol = m_red->chooseMove(m_s, m_inArow, RED);
