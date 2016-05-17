@@ -195,7 +195,7 @@ void GameImpl::play()
         takeTurn();
         m_s.display();
     }
-    
+    m_s.display();
     cout << "The winner is: ";
     switch(winner)
     {
