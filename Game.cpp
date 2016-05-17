@@ -45,7 +45,6 @@ bool GameImpl::completed(int& winner) const
     int lastMoveRow = 0;
     for(int i = 0; i < m_levs; i++)
     {
-        int checker = checkerAt(m_lastMoveCol-1, i);
         if(checkerAt(m_lastMoveCol-1, i) != VACANT)
         {
             lastMoveRow = i; // find the row of the last move
@@ -57,7 +56,6 @@ bool GameImpl::completed(int& winner) const
     int checkersInARow = 0;
     for(int i = lastMoveRow; i < m_s.levels(); i++) // check downward
     {
-        int checker = checkerAt(m_lastMoveCol-1, i);
         if(checkerAt(m_lastMoveCol-1, i) != colorOfLastMove)
         {
             break;
@@ -76,7 +74,6 @@ bool GameImpl::completed(int& winner) const
     int firstColInRow = 0;
     for(int i = m_lastMoveCol-1; i >= 0; i--) // go to first in row
     {
-        int checker = checkerAt(i, lastMoveRow);
         if(checkerAt(i, lastMoveRow) != colorOfLastMove)
         {
             firstColInRow = i+1;
@@ -85,7 +82,6 @@ bool GameImpl::completed(int& winner) const
     }
     for(int i = firstColInRow; i < m_cols; i++) // check across
     {
-        int checker = checkerAt(i, lastMoveRow);
         if(checkerAt(i, lastMoveRow) != colorOfLastMove)
         {
             break;
@@ -101,7 +97,7 @@ bool GameImpl::completed(int& winner) const
     
     
     
-    checkersInARow = 0; // check diagonally from to left to botom right
+    checkersInARow = 0; // check diagonally from top left to botom right
     int firstColInDiagLT = m_lastMoveCol-1;
     int firstRowInDiagLT = lastMoveRow;
     while( firstColInDiagLT>=0 && firstRowInDiagLT>=0 && checkerAt(firstColInDiagLT, firstRowInDiagLT) == colorOfLastMove)
@@ -129,7 +125,6 @@ bool GameImpl::completed(int& winner) const
     checkersInARow = 0; // check diagonally from bottom left to top right
     int firstColInDiagLB = m_lastMoveCol-1;
     int firstRowInDiagLB = lastMoveRow;
-    int checker = checkerAt(firstColInDiagLB, firstRowInDiagLB);
     while( firstColInDiagLB>=0 && firstRowInDiagLB<m_s.levels() && checkerAt(firstColInDiagLB, firstRowInDiagLB) == colorOfLastMove)
     {
         firstColInDiagLB--;
@@ -171,6 +166,8 @@ bool GameImpl::takeTurn()
     }
     if(m_whoseTurn == RED)
     {
+        cout << "Press Enter to Continue" << endl;
+        cin.ignore(10000, '\n');
         m_lastMoveCol = m_red->chooseMove(m_s, m_inArow, RED);
         m_s.makeMove(m_lastMoveCol,RED);
         m_whoseTurn = BLACK;
@@ -178,6 +175,8 @@ bool GameImpl::takeTurn()
     }
     else if( m_whoseTurn == BLACK)
     {
+        cout << "Press Enter to Continue" << endl;
+        cin.ignore(10000, '\n');
         m_lastMoveCol = m_black->chooseMove(m_s, m_inArow, BLACK);
         m_s.makeMove( m_lastMoveCol, BLACK );
         m_whoseTurn = RED;
@@ -195,21 +194,19 @@ void GameImpl::play()
     {
         takeTurn();
         m_s.display();
-        cout << "Press Enter to Continue" << endl;
-        cin.ignore(10000, '\n');
     }
     
     cout << "The winner is: ";
     switch(winner)
     {
         case RED:
-            cout<< "RED!";
+            cout<< "RED!"<<endl;
             break;
         case BLACK:
-            cout << "BLACK!";
+            cout << "BLACK!"<<endl;
             break;
         case TIE_GAME:
-            cout << "TIE GAME!";
+            cout << "TIE GAME!"<<endl;
             break;
     }
 }

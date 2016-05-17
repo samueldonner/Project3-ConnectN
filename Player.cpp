@@ -3,6 +3,7 @@
 #include "provided.h"
 #include <string>
 #include <iostream>
+#include <stack>
 using namespace std;
 
 class HumanPlayerImpl
@@ -10,6 +11,7 @@ class HumanPlayerImpl
   public:
     int chooseMove(const Scaffold& s, int N, int color);
     virtual bool isInteractive() const{return true;}
+private:
 };
 
 class BadPlayerImpl
@@ -71,9 +73,392 @@ int BadPlayerImpl::chooseMove(const Scaffold& s, int N, int color)
     return -1;
 }
 
+bool completed(int& winner, int& rating, int color, int m_lastMoveCol, int m_levs, int m_cols, int m_inArow, const Scaffold& m_s)
+{
+    winner = -2;
+    if( m_lastMoveCol == -1 )
+    {
+        return false;
+    }
+    int lastMoveRow = 0;
+    for(int i = 0; i < m_levs; i++)
+    {
+        if(m_s.checkerAt(m_lastMoveCol-1, i) != VACANT)
+        {
+            lastMoveRow = i; // find the row of the last move
+            break;
+        }
+    }
+    int colorOfLastMove = m_s.checkerAt(m_lastMoveCol-1, lastMoveRow);
+    
+    int checkersInARow = 0;
+    for(int i = lastMoveRow; i < m_s.levels(); i++) // check downward
+    {
+        if(m_s.checkerAt(m_lastMoveCol-1, i) != colorOfLastMove)
+        {
+            break;
+        }
+        checkersInARow++;
+    }
+    
+    if(checkersInARow>=m_inArow)
+    {
+        winner = colorOfLastMove;
+        if(winner==color)
+        {
+            rating = 1;
+        }
+        else
+        {
+            rating = -1;
+        }
+        return true;
+    }
+    
+    
+    checkersInARow = 0;
+    int firstColInRow = 0;
+    for(int i = m_lastMoveCol-1; i >= 0; i--) // go to first in row
+    {
+        if(m_s.checkerAt(i, lastMoveRow) != colorOfLastMove)
+        {
+            firstColInRow = i+1;
+            break;
+        }
+    }
+    for(int i = firstColInRow; i < m_cols; i++) // check across
+    {
+        if(m_s.checkerAt(i, lastMoveRow) != colorOfLastMove)
+        {
+            break;
+        }
+        checkersInARow++;
+    }
+    
+    if(checkersInARow>=m_inArow)
+    {
+        winner = colorOfLastMove;
+        if(winner==color)
+        {
+            rating = 1;
+        }
+        else
+        {
+            rating = -1;
+        }
+        return true;
+    }
+    
+    
+    
+    checkersInARow = 0; // check diagonally from to left to botom right
+    int firstColInDiagLT = m_lastMoveCol-1;
+    int firstRowInDiagLT = lastMoveRow;
+    while( firstColInDiagLT>=0 && firstRowInDiagLT>=0 && m_s.checkerAt(firstColInDiagLT, firstRowInDiagLT) == colorOfLastMove)
+    {
+        firstColInDiagLT--;
+        firstRowInDiagLT--;
+    }
+    firstColInDiagLT++;
+    firstRowInDiagLT++;
+    while(firstColInDiagLT<m_s.cols() && firstRowInDiagLT<m_s.levels() && m_s.checkerAt(firstColInDiagLT, firstRowInDiagLT) == colorOfLastMove
+          )
+    {
+        firstColInDiagLT++;
+        firstRowInDiagLT++;
+        checkersInARow++;
+    }
+    
+    if(checkersInARow>=m_inArow)
+    {
+        winner = colorOfLastMove;
+        if(winner==color)
+        {
+            rating = 1;
+        }
+        else
+        {
+            rating = -1;
+        }
+        return true;
+    }
+    
+    
+    checkersInARow = 0; // check diagonally from bottom left to top right
+    int firstColInDiagLB = m_lastMoveCol-1;
+    int firstRowInDiagLB = lastMoveRow;
+    int checker = m_s.checkerAt(firstColInDiagLB, firstRowInDiagLB);
+    while( firstColInDiagLB>=0 && firstRowInDiagLB<m_s.levels() && m_s.checkerAt(firstColInDiagLB, firstRowInDiagLB) == colorOfLastMove)
+    {
+        firstColInDiagLB--;
+        firstRowInDiagLB++;
+    }
+    firstColInDiagLB++;
+    firstRowInDiagLB--;
+    while(firstColInDiagLB<m_s.cols() && firstRowInDiagLB>=0 && m_s.checkerAt(firstColInDiagLB, firstRowInDiagLB) == colorOfLastMove
+          )
+    {
+        firstColInDiagLB++;
+        firstRowInDiagLB--;
+        checkersInARow++;
+    }
+    
+    if(checkersInARow>=m_inArow)
+    {
+        winner = colorOfLastMove;
+        if(winner==color)
+        {
+            rating = 1;
+        }
+        else
+        {
+            rating = -1;
+        }
+        return true;
+    }
+    
+    
+    if(m_s.numberEmpty()==0) // if board is full game is tied
+    {
+        winner = TIE_GAME;
+        rating = 0;
+        return true;
+    }
+    
+    return false;
+}
+int bestHumanMove( int &result, Scaffold s, int &score, int &depth, int &winner, int color, int N, stack<int> goodMoves, stack<int> goodMoveRating, stack<int> depthStack, stack<int> goodHumanMove);
+
+
+int bestComputerMove( int &result, Scaffold s, int &score, int &depth, int &winner, int color, int N, stack<int> goodMoves, stack<int> goodMoveRating, stack<int> depthStack, stack<int> goodHumanMove)
+{
+    int levs = s.levels();
+    int cols = s.cols();
+    int oppositeColor = RED;
+    if(color == RED)
+        oppositeColor = BLACK;
+    int i;
+    for( i = 0; i < cols; i++ ) // each possible move
+    {
+        s.makeMove(i+1, color); // make must update scaffold
+        depth++;
+        int rating = -2;
+        completed(winner, rating, color, i+1, levs, cols, N, s); // rate scaffold move
+        if(rating == 0 || rating == color || rating == oppositeColor)
+        {
+            score+=rating; // store rating
+            goodMoves.push(i);
+            goodMoveRating.push(rating);
+            depthStack.push(depth);
+        }
+        goodHumanMove.push(bestComputerMove( result, s, score, depth, winner, color, N, goodMoves,goodMoveRating, depthStack, goodHumanMove));
+        s.undoMove();
+    }
+    stack<int> ties;
+    stack<int> losses;
+    stack<int> wins;
+    stack<int> depthWin;
+    stack<int> depthTie;
+    stack<int> depthLoss;
+    while( !depthStack.empty() )
+    {
+        if(goodMoveRating.top() == color)
+        {
+            ties.push(goodMoves.top());
+            depthTie.push(depthStack.top());
+            depthStack.pop();
+            goodMoves.pop();
+            goodMoveRating.pop();
+        }
+        else
+        {
+            wins.push(goodMoves.top());
+            depthStack.pop();
+            goodMoves.pop();
+            goodMoveRating.pop();
+        }
+    }
+    int bestWinDepth = depthWin.top();
+    int bestMove = -1;
+    while(!wins.empty())
+    {
+        if(depthWin.top()<=bestWinDepth)
+        {
+            bestWinDepth = depthWin.top();
+            bestMove = wins.top();
+            wins.pop();
+            depthWin.pop();
+        }
+        else
+        {
+            wins.pop();
+            depthWin.pop();
+        }
+        result = 1;
+    }
+    
+    int bestTieDepth = depthTie.top();
+    while(!ties.empty() && wins.empty() )
+    {
+        if(depthTie.top()<=bestTieDepth)
+        {
+            bestTieDepth = depthTie.top();
+            bestMove = ties.top();
+            ties.pop();
+            depthTie.pop();
+        }
+        else
+        {
+            ties.pop();
+            depthTie.pop();
+        }
+        result = 0;
+    }
+    
+    int bestLossDepth = depthLoss.top();
+    while(!losses.empty() && ties.empty() && wins.empty() )
+    {
+        if(depthLoss.top()<=bestLossDepth)
+        {
+            bestLossDepth = depthLoss.top();
+            bestMove = losses.top();
+            losses.pop();
+            depthLoss.pop();
+        }
+        else
+        {
+            losses.pop();
+            depthLoss.pop();
+        }
+        result = -1;
+    }
+    
+    return bestMove;
+}
+
+int bestHumanMove( int &result, Scaffold s, int &score, int &depth, int &winner, int color, int N, stack<int> goodMoves, stack<int> goodMoveRating, stack<int> depthStack, stack<int> goodComputerMove)
+{
+    int levs = s.levels();
+    int cols = s.cols();
+    int oppositeColor = RED;
+    if(color == RED)
+        oppositeColor = BLACK;
+    int i;
+    for( i = 0; i < cols; i++ ) // each possible move
+    {
+        s.makeMove(i+1, color); // make must update scaffold
+        depth++;
+        int rating = -2;
+        completed(winner, rating, color, i+1, levs, cols, N, s); // rate scaffold move
+        if(rating == 0 || rating == color || rating == oppositeColor)
+        {
+            score+=rating; // store rating
+            goodMoves.push(i);
+            goodMoveRating.push(rating);
+            depthStack.push(depth);
+        }
+        goodComputerMove.push(bestComputerMove( result, s, score, depth, winner, color, N, goodMoves,goodMoveRating, depthStack, goodComputerMove));
+        s.undoMove();
+    }
+    stack<int> ties;
+    stack<int> losses;
+    stack<int> wins;
+    stack<int> depthWin;
+    stack<int> depthTie;
+    stack<int> depthLoss;
+    while( !depthStack.empty() )
+    {
+        if(goodMoveRating.top() == color)
+        {
+            ties.push(goodMoves.top());
+            depthTie.push(depthStack.top());
+            depthStack.pop();
+            goodMoves.pop();
+            goodMoveRating.pop();
+        }
+        else
+        {
+            wins.push(goodMoves.top());
+            depthStack.pop();
+            goodMoves.pop();
+            goodMoveRating.pop();
+        }
+    }
+    
+    
+   
+    int bestMove = -1;
+    
+    int bestLossDepth = depthLoss.top();
+    while(!losses.empty())
+    {
+        if(depthLoss.top()<=bestLossDepth)
+        {
+            bestLossDepth = depthLoss.top();
+            bestMove = losses.top();
+            losses.pop();
+            depthLoss.pop();
+        }
+        else
+        {
+            losses.pop();
+            depthLoss.pop();
+        }
+        result = -1;
+    }
+    
+    int bestTieDepth = depthTie.top();
+    while(!ties.empty() && losses.empty() )
+    {
+        if(depthTie.top()<=bestTieDepth)
+        {
+            bestTieDepth = depthTie.top();
+            bestMove = ties.top();
+            ties.pop();
+            depthTie.pop();
+        }
+        else
+        {
+            ties.pop();
+            depthTie.pop();
+        }
+        result = 0;
+    }
+    
+    int bestWinDepth = depthWin.top();
+    while(!wins.empty() && losses.empty() && ties.empty())
+    {
+        if(depthWin.top()<=bestWinDepth)
+        {
+            bestWinDepth = depthWin.top();
+            bestMove = wins.top();
+            wins.pop();
+            depthWin.pop();
+        }
+        else
+        {
+            wins.pop();
+            depthWin.pop();
+        }
+        result = 1;
+    }
+    
+    
+    return bestMove;
+}
+
+
 int SmartPlayerImpl::chooseMove(const Scaffold& s, int N, int color)
 {
-    return -1;  //  This is not always correct; it's just here to compile
+    int score = 0;
+    int depth = 0;
+    int winner = -2;
+    int result = -2;
+    stack<int> goodMoves;
+    stack<int> goodMoveRating;
+    stack<int> depthStack;
+    stack<int> goodHumanMove;
+    return bestComputerMove( result, s, score, depth, winner, color, N, goodMoves, goodMoveRating, depthStack, goodHumanMove);
 }
 
 //******************** Player derived class functions *************************
