@@ -7,8 +7,9 @@ using namespace std;
 
 int main()
 {
-    SmartPlayer bp("Homer");
-    BadPlayer hp("Marge");
+    HumanPlayer
+    bp("Homer");
+    HumanPlayer hp("Marge");
     Game g(3, 3, 3, &bp, &hp);
     g.play();
     
