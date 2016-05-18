@@ -3,7 +3,7 @@
 #include "provided.h"
 #include <string>
 #include <iostream>
-#include <stack>
+#include <vector>
 using namespace std;
 
 class HumanPlayerImpl
@@ -247,10 +247,7 @@ void recursion(Scaffold& s, int& score, int color, int& winner, int N)
         }
         else
         {
-            int otherColor = RED;
-            if(color == RED)
-                otherColor = BLACK;
-            recursion2(s, score, otherColor, winner, N);
+            recursion2(s, score, !color, winner, N);
         }
         s.undoMove();
     }
@@ -281,8 +278,99 @@ void recursion2(Scaffold& s, int& score, int color, int& winner, int N)
     }
 }
 
+
+
+
+
+
+/*int HumanBestMove(Scaffold s, int N, int color, int& moveMade, vector<int> depth, vector<int> colVec);
+int computerBestMove(Scaffold s, int N, int color, int& moveMade, vector<int> depth, vector<int> colVec)
+{
+    int winner = -2;
+    for( int i = 0; i < s.cols(); i ++ )
+    {
+        int rating = -2;
+        if(!s.makeMove(i+1, color))
+        {
+            continue;
+        }
+        moveMade++;
+        completed(winner, rating, color, i+1, s.levels(), s.cols(), N, s);
+        if( rating == 1||rating==0)
+        {
+            depth.push_back(moveMade);
+            colVec.push_back(i);
+            for(int j = 0; j < moveMade; j++)
+            {
+                s.undoMove();
+            }
+            return i+1;
+        }
+        else
+        {
+            s.makeMove(HumanBestMove(s,N,!color, moveMade, depth, colVec),!color);
+            moveMade++;
+            i--;
+            continue;
+        }
+        
+    }
+    return 1;
+}
+
+int HumanBestMove(Scaffold s, int N, int color, int& moveMade, vector<int> depth, vector<int> colVec) // vector of wins
+{
+    int winner = -2;
+    for( int i = 0; i < s.cols(); i ++ )
+    {
+        int rating = -2;
+        if(!s.makeMove(i+1, color))
+        {
+            continue;
+        }
+        moveMade++;
+        completed(winner, rating, color, i+1, s.levels(), s.cols(), N, s);
+        if( rating == 1||rating==0)
+        {
+            for(int j = 0; j < moveMade; j++)
+            {
+                s.undoMove();
+            }
+            return i+1;
+        }
+        else
+        {
+            s.makeMove(computerBestMove(s,N,!color, moveMade, depth, colVec),!color);
+            moveMade++;
+            i--;
+            continue;
+        }
+        
+    }
+    return 1;
+}*/
+
 int bestMove(Scaffold s, int N, int color)
 {
+    /*vector<int> depth;
+    vector<int> colVec;
+    int moveMade = 0;
+    computerBestMove(s, N, color, moveMade, depth, colVec);
+    int smallest = 0;
+    int smallesti = 0;
+    if(!depth.empty())
+    {
+        for(int i = 0; i < depth.size(); i++)
+        {
+            if(depth[i]<=smallest)
+            {
+                smallest = depth[i];
+                smallesti = i;
+            }
+        }
+        return colVec[smallesti];
+    }
+    return 1;*/
     int winner = -2;
     int score = 0;
     for( int i = 0; i < s.cols(); i ++ )
@@ -316,6 +404,7 @@ int bestMove(Scaffold s, int N, int color)
             return i+1;
         }
     }
+    
 
     
     
