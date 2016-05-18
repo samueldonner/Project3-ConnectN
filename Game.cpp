@@ -166,8 +166,8 @@ bool GameImpl::takeTurn()
     }
     if(m_whoseTurn == RED)
     {
-        cout << "Press Enter to Continue" << endl;
-        cin.ignore(10000, '\n');
+        //cout << "Press Enter to Continue" << endl;
+        //cin.ignore(10000, '\n');
         m_lastMoveCol = m_red->chooseMove(m_s, m_inArow, RED);
         m_s.makeMove(m_lastMoveCol,RED);
         m_whoseTurn = BLACK;
@@ -175,8 +175,8 @@ bool GameImpl::takeTurn()
     }
     else if( m_whoseTurn == BLACK)
     {
-        cout << "Press Enter to Continue" << endl;
-        cin.ignore(10000, '\n');
+        //cout << "Press Enter to Continue" << endl;
+        //4cin.ignore(10000, '\n');
         m_lastMoveCol = m_black->chooseMove(m_s, m_inArow, BLACK);
         m_s.makeMove( m_lastMoveCol, BLACK );
         m_whoseTurn = RED;

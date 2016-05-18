@@ -285,8 +285,43 @@ int bestMove(Scaffold s, int N, int color)
 {
     int winner = -2;
     int score = 0;
+    for( int i = 0; i < s.cols(); i ++ )
+    {
+        int rating = -2;
+        if(!s.makeMove(i+1, color))
+        {
+            continue;
+        }
+        completed(winner, rating, color, i+1, s.levels(), s.cols(), N, s);
+        s.undoMove();
+        if( rating == 1)
+        {
+            return i+1;
+        }
+    }
+    
+    winner = -2;
+    score = 0;
+    for( int i = 0; i < s.cols(); i ++ )
+    {
+        int rating = -2;
+        if(!s.makeMove(i+1, !color))
+        {
+            continue;
+        }
+        completed(winner, rating, !color, i+1, s.levels(), s.cols(), N, s);
+        s.undoMove();
+        if( rating == 1)
+        {
+            return i+1;
+        }
+    }
+
+    
+    
     int bestMove = 0;
     recursion(s, score, color, winner, N);
+    
     for( int i = 0; i < s.cols(); i ++ )
     {
         if(!s.makeMove(i+1, color))

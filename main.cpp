@@ -7,10 +7,9 @@ using namespace std;
 
 int main()
 {
-    HumanPlayer
-    bp("Homer");
+    SmartPlayer bp("Homer");
     HumanPlayer hp("Marge");
-    Game g(3, 3, 3, &bp, &hp);
+    Game g(4, 4, 3, &bp, &hp);
     g.play();
     
     /*Scaffold s(3, 2);
