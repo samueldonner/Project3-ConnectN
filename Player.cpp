@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <climits>
 using namespace std;
 
 class HumanPlayerImpl
@@ -229,9 +230,9 @@ bool completed(int& winner, int& rating, int color, int m_lastMoveCol, int m_lev
 }
 
 
-void recursion2(Scaffold& s, int& score, int color, int& winner, int N);
+void recursion2(Scaffold& s, double& score, int color, int& winner, int N);
 
-void recursion(Scaffold& s, int& score, int color, int& winner, int N)
+void recursion(Scaffold& s, double& score, int color, int& winner, int N)
 {
     for( int i = 0; i < s.cols(); i++ )
     {
@@ -242,7 +243,7 @@ void recursion(Scaffold& s, int& score, int color, int& winner, int N)
         if( completed(winner, rating, color, i+1, s.levels(), s.cols(), N, s) )
         {
             if(rating == 1 || rating == 0)
-                score+= rating;
+                score+= rating*(s.cols()*s.levels()) - (s.cols()*s.levels()-s.numberEmpty());
             //s.display();
         }
         else
@@ -253,173 +254,47 @@ void recursion(Scaffold& s, int& score, int color, int& winner, int N)
     }
 }
 
-void recursion2(Scaffold& s, int& score, int color, int& winner, int N)
+void recursion2(Scaffold& s, double& score, int color, int& winner, int N)
 {
     
     for( int i = 0; i < s.cols(); i++ )
     {
         if(!s.makeMove(i+1, color))
             continue;
+        //s.display();
+        //cout<< "WORKING";
         int rating = 0;
         if(completed(winner, rating, color, i+1, s.levels(), s.cols(), N, s))
         {
             //s.display();
             if(rating == 1 || rating == 0)
-                score-= rating;
+                score-= rating*(s.cols()*s.levels()) - (s.cols()*s.levels()-s.numberEmpty());
         }
         else
         {
-            int otherColor = RED;
-            if(color == RED)
-                otherColor = BLACK;
-            recursion(s, score, otherColor, winner, N);
+            recursion(s, score, !color, winner, N);
         }
         s.undoMove();
     }
 }
-
-
-
-
-
-
-/*int HumanBestMove(Scaffold s, int N, int color, int& moveMade, vector<int> depth, vector<int> colVec);
-int computerBestMove(Scaffold s, int N, int color, int& moveMade, vector<int> depth, vector<int> colVec)
-{
-    int winner = -2;
-    for( int i = 0; i < s.cols(); i ++ )
-    {
-        int rating = -2;
-        if(!s.makeMove(i+1, color))
-        {
-            continue;
-        }
-        moveMade++;
-        completed(winner, rating, color, i+1, s.levels(), s.cols(), N, s);
-        if( rating == 1||rating==0)
-        {
-            depth.push_back(moveMade);
-            colVec.push_back(i);
-            for(int j = 0; j < moveMade; j++)
-            {
-                s.undoMove();
-            }
-            return i+1;
-        }
-        else
-        {
-            s.makeMove(HumanBestMove(s,N,!color, moveMade, depth, colVec),!color);
-            moveMade++;
-            i--;
-            continue;
-        }
-        
-    }
-    return 1;
-}
-
-int HumanBestMove(Scaffold s, int N, int color, int& moveMade, vector<int> depth, vector<int> colVec) // vector of wins
-{
-    int winner = -2;
-    for( int i = 0; i < s.cols(); i ++ )
-    {
-        int rating = -2;
-        if(!s.makeMove(i+1, color))
-        {
-            continue;
-        }
-        moveMade++;
-        completed(winner, rating, color, i+1, s.levels(), s.cols(), N, s);
-        if( rating == 1||rating==0)
-        {
-            for(int j = 0; j < moveMade; j++)
-            {
-                s.undoMove();
-            }
-            return i+1;
-        }
-        else
-        {
-            s.makeMove(computerBestMove(s,N,!color, moveMade, depth, colVec),!color);
-            moveMade++;
-            i--;
-            continue;
-        }
-        
-    }
-    return 1;
-}*/
 
 int bestMove(Scaffold s, int N, int color)
 {
-    /*vector<int> depth;
-    vector<int> colVec;
-    int moveMade = 0;
-    computerBestMove(s, N, color, moveMade, depth, colVec);
-    int smallest = 0;
-    int smallesti = 0;
-    if(!depth.empty())
-    {
-        for(int i = 0; i < depth.size(); i++)
-        {
-            if(depth[i]<=smallest)
-            {
-                smallest = depth[i];
-                smallesti = i;
-            }
-        }
-        return colVec[smallesti];
-    }
-    return 1;*/
     int winner = -2;
-    int score = 0;
-    for( int i = 0; i < s.cols(); i ++ )
-    {
-        int rating = -2;
-        if(!s.makeMove(i+1, color))
-        {
-            continue;
-        }
-        completed(winner, rating, color, i+1, s.levels(), s.cols(), N, s);
-        s.undoMove();
-        if( rating == 1)
-        {
-            return i+1;
-        }
-    }
-    
-    winner = -2;
-    score = 0;
-    for( int i = 0; i < s.cols(); i ++ )
-    {
-        int rating = -2;
-        if(!s.makeMove(i+1, !color))
-        {
-            continue;
-        }
-        completed(winner, rating, !color, i+1, s.levels(), s.cols(), N, s);
-        s.undoMove();
-        if( rating == 1)
-        {
-            return i+1;
-        }
-    }
-    
-
-    
-    
     int bestMove = 0;
-    recursion(s, score, color, winner, N);
+    int compareScore = INT_MAX;
+    //recursion(s, compareScore, color, winner, N);
     
     for( int i = 0; i < s.cols(); i ++ )
     {
+        double score = 0;
         if(!s.makeMove(i+1, color))
             continue;
-        int compareScore = score;
-        recursion(s, score, color, winner, N);
+        recursion(s, score, !color, winner, N);
         cout << "SCORE: " << score <<" COL: " << i+1 << endl;
-        if( score >= compareScore )
+        if( score <= compareScore )
         {
+            compareScore = score;
             bestMove = i+1;
         }
         s.undoMove();
@@ -432,6 +307,7 @@ int SmartPlayerImpl::chooseMove(const Scaffold& s, int N, int color)
     return bestMove(s, N, color);
 }
 
+
 //******************** Player derived class functions *************************
 
 // These functions simply delegate to the Impl classes' functions.
@@ -442,12 +318,12 @@ HumanPlayer::HumanPlayer(string nm)
 {
     m_impl = new HumanPlayerImpl;
 }
- 
+
 HumanPlayer::~HumanPlayer()
 {
     delete m_impl;
 }
- 
+
 int HumanPlayer::chooseMove(const Scaffold& s, int N, int color)
 {
     return m_impl->chooseMove(s, N, color);
